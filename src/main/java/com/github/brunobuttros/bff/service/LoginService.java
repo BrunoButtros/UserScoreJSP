@@ -1,5 +1,7 @@
 package com.github.brunobuttros.bff.service;
 
+import com.github.brunobuttros.bff.dto.AuthenticationDTO;
+import com.github.brunobuttros.bff.dto.TokenDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,8 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class LoginService {
@@ -18,21 +19,22 @@ public class LoginService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public String authenticate(String username, String password) {
+    public String authenticate(String login, String password) {
         String authUrl = "http://localhost:8080/auth/login";
-        Map<String, String> credentials = new HashMap<>();
-        credentials.put("login", username);
-        credentials.put("password", password);
+
+        AuthenticationDTO credentials = new AuthenticationDTO(login, password);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(credentials, headers);
+
+        HttpEntity<AuthenticationDTO> request = new HttpEntity<>(credentials, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(authUrl, HttpMethod.POST, request, String.class);
+            ResponseEntity<TokenDTO> response = restTemplate.exchange(authUrl, HttpMethod.POST, request, TokenDTO.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
+                TokenDTO tokenDTO = response.getBody();
+                return tokenDTO.token();
             } else {
                 throw new HttpClientErrorException(response.getStatusCode());
             }

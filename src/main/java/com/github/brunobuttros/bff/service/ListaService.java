@@ -1,8 +1,11 @@
 package com.github.brunobuttros.bff.service;
 
 import com.github.brunobuttros.bff.dto.UserListDTO;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,12 +24,17 @@ public class ListaService {
         this.userscoreBaseUrl = "http://localhost:8080";
     }
 
-    public List<UserListDTO> getAllUserScores() {
+    public List<UserListDTO> getAllUserScores(HttpSession session) {
         String url = userscoreBaseUrl + "/user/scores";
+        HttpHeaders headers = new HttpHeaders();
+        String token = (String) session.getAttribute("token");
+        headers.set("Authorization", "Bearer ".concat(token));
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                entity,
                 new ParameterizedTypeReference<List<UserListDTO>>() {}
         ).getBody();
     }

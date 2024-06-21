@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>login nao funciona</title>
+    <title>Error</title>
 </head>
 <body>
-    <h1>desisto do login</h1>
-    <p>${mensagem}</p>
+    <h1>Error</h1>
+    <p>${error}</p>
 </body>
 </html>
