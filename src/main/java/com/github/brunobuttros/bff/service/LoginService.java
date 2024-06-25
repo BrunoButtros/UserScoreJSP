@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.servlet.http.HttpSession;
-
 @Service
 public class LoginService {
 
@@ -34,7 +32,11 @@ public class LoginService {
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 TokenDTO tokenDTO = response.getBody();
-                return tokenDTO.token();
+                if (tokenDTO != null && tokenDTO.token() != null && !tokenDTO.token().isEmpty()) {
+                    return tokenDTO.token();
+                } else {
+                    throw new RuntimeException("Empty token received from the authentication server");
+                }
             } else {
                 throw new HttpClientErrorException(response.getStatusCode());
             }
